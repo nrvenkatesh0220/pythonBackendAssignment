@@ -50,8 +50,8 @@ def get_author_details(quote_container):
 
 url = "http://quotes.toscrape.com/"
 result = requests.get(url) 
-doc = BeautifulSoup(result.text , "html.parser")
-quotes_containers = doc.find_all("div" , class_ ="quote")
+document = BeautifulSoup(result.text , "html.parser")
+quotes_containers = document.find_all("div" , class_ ="quote")
 
 quotes_list = [] 
 authors_list = []
