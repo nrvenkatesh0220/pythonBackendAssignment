@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import json
 
+python_data = {"quotes" : [] ,"authors" : []}
+
 def get_quote_details(quote_container):
     quote_dict = dict()
    
@@ -48,25 +50,43 @@ def get_author_details(quote_container):
     
     return author_dict
 
-url = "http://quotes.toscrape.com/"
-result = requests.get(url) 
-document = BeautifulSoup(result.text , "html.parser")
-quotes_containers = document.find_all("div" , class_ ="quote")
+def get_url_of_next_page(doc):
+    next_button_element = doc.find("li" , class_ = "next")
+    if next_button_element == None:
+        return None
+    anchor_element = next_button_element.find("a") 
+    url = "http://quotes.toscrape.com" + anchor_element["href"]
+    return url
 
-quotes_list = [] 
-authors_list = []
-for quote_container in quotes_containers:
-    quote_details = get_quote_details(quote_container)
-    author_details = get_author_details(quote_container)
-
-    quotes_list.append(quote_details)
-    authors_list.append(author_details)
+def get_data_from_page(python_data ,url):
+    quotes_list = python_data.get("quotes")
+    authors_list = python_data.get("authors")
     
-data = {
-    "quotes" : quotes_list ,
-    "authors" : authors_list
-}
+    result = requests.get(url) 
+    doc = BeautifulSoup(result.text , "html.parser")
+    quotes_containers = doc.find_all("div" , class_ ="quote")
 
-json_data = json.dumps(data)
+    for quote_container in quotes_containers:
+        quote_details = get_quote_details(quote_container)
+        author_details = get_author_details(quote_container)
+
+        quotes_list.append(quote_details)
+        if author_details not in authors_list:
+            authors_list.append(author_details)   
+    
+    new_python_data = { "quotes" : quotes_list , "authors" : authors_list}
+    next_page_url = get_url_of_next_page(doc)
+    
+    return (new_python_data,next_page_url)
+
+
+first_page_url = "http://quotes.toscrape.com/"
+python_data , url = get_data_from_page(python_data , first_page_url) 
+
+for _ in range(9): #Since page contains 10 pages
+   python_data , url = get_data_from_page(python_data , url)
+
+json_data = json.dumps(python_data)
 with open("quotes.json" , "w") as f:
     f.write(json_data) 
+
