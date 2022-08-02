@@ -15,12 +15,12 @@ quotes_list = python_data.get("quotes")
 authors_list = python_data.get("authors")
 
 
-cursor.execute("""CREATE TABLE author(
-        author_id INTEGER NOT NULL  PRIMARY KEY AUTOINCREMENT,
-        name VARCHAR ,
-        born TEXT ,
-        referece TEXT 
+cursor.execute("""CREATE TABLE quote(
+        quote_id INTEGER NOT NULL  PRIMARY KEY AUTOINCREMENT,
+        quote TEXT ,
+        author_id INT ,
+        FOREIGN KEY (author_id) REFERENCES author(author_id) ON DELETE CASCADE
     )""") 
-print("Author table created")
+print("Quote table created")
 
 
