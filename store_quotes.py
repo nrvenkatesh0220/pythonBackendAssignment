@@ -15,10 +15,13 @@ quotes_list = python_data.get("quotes")
 authors_list = python_data.get("authors")
 
 
-cursor.execute("""CREATE TABLE tag(
-        tag_id INTEGER NOT NULL  PRIMARY KEY AUTOINCREMENT,
-        tag TEXT
-    );""") 
-print("Tag table created")
+cursor.execute("""CREATE TABLE quote_tag(
+        id INTEGER NOT NULL  PRIMARY KEY AUTOINCREMENT,
+        quote_id INT ,
+        tag_id INT ,
+        FOREIGN KEY (quote_id) REFERENCES quote(quote_id) ON DELETE CASCADE ,
+        FOREIGN KEY (tag_id) REFERENCES tag(tag_id) ON DELETE CASCADE
+    );""")
+print("quote_tag table created")
 
 
